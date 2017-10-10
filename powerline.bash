@@ -26,7 +26,8 @@ __powerline() {
   else
     readonly GIT_BRANCH_SYMBOL=''
   fi
-  readonly GIT_BRANCH_CHANGED_SYMBOL='Δ'
+  readonly GIT_BRANCH_ADDED_SYMBOL='Δ'
+  readonly GIT_BRANCH_UNADDED_SYMBOL='*'
   readonly GIT_NEED_PUSH_SYMBOL='↑'
   readonly GIT_NEED_PULL_SYMBOL='↓'
 
@@ -120,14 +121,12 @@ __powerline() {
     __block_text=''
     if [ ! -z "$last_bg" ]; then
       if [ ! -z "${POWERLINE_FONT+x}" ]; then
-        __block_text+="$(__colour $DEFAULT_BG 'bg')"
+        __block_text+="$RESET"
         __block_text+="$(__colour "$last_bg" 'fg')"
         __block_text+="$BLOCK_START$RESET"
-        __block_text+="$(__colour $DEFAULT_BG 'bg')"
-        __block_text+="$(__colour "$DEFAULT_FG" 'fg')"
+        __block_text+="$RESET"
       else
-        __block_text+="$(__colour $DEFAULT_BG 'bg')"
-        __block_text+="$(__colour "$DEFAULT_FG" 'fg')"
+        __block_text+="$RESET"
       fi
     fi
     __block_text+=' '
@@ -185,9 +184,13 @@ __powerline() {
     local marks
 
     # check if HEAD is dirty
-    if [ -n "$($git_eng status --porcelain 2>/dev/null)" ]; then
+    if ! ($git_eng diff --no-ext-diff --cached --quiet); then
       dirty='y'
-      marks+=" $GIT_BRANCH_CHANGED_SYMBOL"
+      marks+="$GIT_BRANCH_ADDED_SYMBOL"
+    fi
+    if ! ($git_eng diff --no-ext-diff --quiet); then
+      dirty='y'
+      marks+="$GIT_BRANCH_UNADDED_SYMBOL"
     fi
 
     # how many commits local branch is ahead/behind of remote?
@@ -334,8 +337,8 @@ __powerline() {
     __virtualenv_block
     PS1+=$__block_text
 
-    __user_block
-    PS1+=$__block_text
+    # __user_block
+    # PS1+=$__block_text
 
     __pwd_block
     PS1+=$__block_text
