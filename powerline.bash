@@ -99,17 +99,16 @@ __powerline() {
     if [[ ! -z "$last_bg" && "$bg" != "$last_bg" && ! -z "${POWERLINE_FONT+x}" ]]; then
       block+="$(__colour "$bg" 'bg')"
       block+="$(__colour "$last_bg" 'fg')"
-      block+="$BLOCK_START $RESET"
+      block+="$BLOCK_START$RESET"
       block+="$(__colour "$bg" 'bg')"
       block+="$(__colour "$fg" 'fg')"
     else
       block+="$(__colour "$bg" 'bg')"
       block+="$(__colour "$fg" 'fg')"
-      block+=" "
     fi
 
     if [ ! -z "${3+x}" ]; then
-      block+="$3 $RESET"
+      block+="$3$RESET"
     fi
 
     last_bg=$bg
@@ -299,17 +298,17 @@ __powerline() {
   __status_block() {
     local text
     if [ "$exit_code" != 0 ]; then
-      __prompt_block $BLACK $RED '✘'
+      __prompt_block $BLACK $RED '✘ '
       text+=$__block_text
     fi
 
     if [ "$(id -u "$USER")" == 0 ]; then
-      __prompt_block $BLACK $YELLOW '⚡'
+      __prompt_block $BLACK $YELLOW '⚡ '
       text+=$__block_text
     fi
 
     if [ "$(jobs -l | wc -l)" != 0 ]; then
-      __prompt_block $BLACK $CYAN '⚙'
+      __prompt_block $BLACK $CYAN '⚙ '
       text+=$__block_text
     fi
 
