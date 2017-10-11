@@ -25,7 +25,7 @@ __powerline() {
     readonly GIT_BRANCH_SYMBOL='⑂'
     readonly GOLANG_SYMBOL='Go>'
   else
-    readonly GIT_BRANCH_SYMBOL=''
+    readonly GIT_BRANCH_SYMBOL='' # ''
     readonly GOLANG_SYMBOL=''
   fi
   readonly GIT_BRANCH_ADDED_SYMBOL='Δ'
@@ -101,16 +101,17 @@ __powerline() {
     if [[ ! -z "$last_bg" && "$bg" != "$last_bg" && ! -z "${POWERLINE_FONT+x}" ]]; then
       block+="$(__colour "$bg" 'bg')"
       block+="$(__colour "$last_bg" 'fg')"
-      block+="$BLOCK_START$RESET"
+      block+="$BLOCK_START $RESET"
       block+="$(__colour "$bg" 'bg')"
       block+="$(__colour "$fg" 'fg')"
     else
       block+="$(__colour "$bg" 'bg')"
       block+="$(__colour "$fg" 'fg')"
+      block+=" "
     fi
 
     if [ ! -z "${3+x}" ]; then
-      block+="$3$RESET"
+      block+="$3 $RESET"
     fi
 
     last_bg=$bg
@@ -130,7 +131,7 @@ __powerline() {
         __block_text+="$RESET"
       fi
     fi
-    #__block_text+=' '
+    __block_text+=' '
   }
 
   ### Prompt components
@@ -177,9 +178,9 @@ __powerline() {
     # expanded later (when it's time to draw the prompt)
     if shopt -q promptvars; then
       export __git_ps1_block="$branch"
-      ref="$ref_symbol\${__git_ps1_block}"
+      ref="$ref_symbol \${__git_ps1_block}"
     else
-      ref="$ref_symbol$branch"
+      ref="$ref_symbol $branch"
     fi
 
     local marks
@@ -187,11 +188,11 @@ __powerline() {
     # check if HEAD is dirty
     if ! ($git_eng diff --no-ext-diff --cached --quiet); then
       dirty='y'
-      marks+="$GIT_BRANCH_ADDED_SYMBOL"
+      marks+=" $GIT_BRANCH_ADDED_SYMBOL"
     fi
     if ! ($git_eng diff --no-ext-diff --quiet); then
       dirty='y'
-      marks+="$GIT_BRANCH_UNADDED_SYMBOL"
+      marks+=" $GIT_BRANCH_UNADDED_SYMBOL"
     fi
 
     # how many commits local branch is ahead/behind of remote?
@@ -247,7 +248,7 @@ __powerline() {
 
   __pwd_block() {
     if (pwd | grep -q "^$GOPATH/src/[^/]*/[^/]*/"); then
-      local pwd; pwd=$(pwd | sed -e "s|^$GOPATH/src/[^/]*/[^/]*/|$GOLANG_SYMBOL|")
+      local pwd; pwd=$(pwd | sed -e "s|^$GOPATH/src/[^/]*/[^/]*/|$GOLANG_SYMBOL |")
     else
       # Use ~ to represent $HOME prefix
       local pwd; pwd=$(pwd | sed -e "s|^$HOME|~|")
@@ -304,17 +305,17 @@ __powerline() {
   __status_block() {
     local text
     if [ "$exit_code" != 0 ]; then
-      __prompt_block $BLACK $RED '✘ '
+      __prompt_block $BLACK $RED '✘'
       text+=$__block_text
     fi
 
     if [ "$(id -u "$USER")" == 0 ]; then
-      __prompt_block $BLACK $YELLOW '⚡ '
+      __prompt_block $BLACK $YELLOW '⚡'
       text+=$__block_text
     fi
 
     if [ "$(jobs -l | wc -l | sed 's/  *//')" != 0 ]; then
-      __prompt_block $BLACK $CYAN '⚙ '
+      __prompt_block $BLACK $CYAN '⚙'
       text+=$__block_text
     fi
 
