@@ -314,7 +314,7 @@ __powerline() {
       text+=$__block_text
     fi
 
-    if [ "$(jobs -l | wc -l | sed 's/  *//')" != 0 ]; then
+    if [ "$(jobs -l | wc -l | sed 's/  *//')" != "0" ]; then
       __prompt_block $BLACK $CYAN '⚙ '
       text+=$__block_text
     fi
