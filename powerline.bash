@@ -305,17 +305,17 @@ __powerline() {
   __status_block() {
     local text
     if [ "$exit_code" != 0 ]; then
-      __prompt_block $BLACK $RED '✘'
+      __prompt_block $BLACK $RED '✘ '
       text+=$__block_text
     fi
 
     if [ "$(id -u "$USER")" == 0 ]; then
-      __prompt_block $BLACK $YELLOW '⚡'
+      __prompt_block $BLACK $YELLOW '⚡ '
       text+=$__block_text
     fi
 
     if [ "$(jobs -l | wc -l | sed 's/  *//')" != 0 ]; then
-      __prompt_block $BLACK $CYAN '⚙'
+      __prompt_block $BLACK $CYAN '⚙ '
       text+=$__block_text
     fi
 
