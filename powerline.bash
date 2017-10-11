@@ -23,8 +23,10 @@ __powerline() {
   # Unicode symbols
   if [ -z "${POWERLINE_FONT+x}" ]; then
     readonly GIT_BRANCH_SYMBOL='⑂'
+    readonly GOLANG_SYMBOL='Go>'
   else
     readonly GIT_BRANCH_SYMBOL=''
+    readonly GOLANG_SYMBOL=''
   fi
   readonly GIT_BRANCH_ADDED_SYMBOL='Δ'
   readonly GIT_BRANCH_UNADDED_SYMBOL='*'
@@ -128,7 +130,7 @@ __powerline() {
         __block_text+="$RESET"
       fi
     fi
-    __block_text+=' '
+    #__block_text+=' '
   }
 
   ### Prompt components
@@ -175,9 +177,9 @@ __powerline() {
     # expanded later (when it's time to draw the prompt)
     if shopt -q promptvars; then
       export __git_ps1_block="$branch"
-      ref="$ref_symbol \${__git_ps1_block}"
+      ref="$ref_symbol\${__git_ps1_block}"
     else
-      ref="$ref_symbol $branch"
+      ref="$ref_symbol$branch"
     fi
 
     local marks
@@ -244,16 +246,20 @@ __powerline() {
   }
 
   __pwd_block() {
-    # Use ~ to represent $HOME prefix
-    local pwd; pwd=$(pwd | sed -e "s|^$HOME|~|")
-    # shellcheck disable=SC1001,SC2088
-    if [[ ( $pwd = ~\/*\/* || $pwd = \/*\/*/* ) && ${#pwd} -gt $MAX_PATH_LENGTH ]]; then
-      local IFS='/'
-      read -ra split <<< "$pwd"
-      if [[ $pwd = ~* ]]; then
-        pwd="~/${split[1]}/.../${split[*]:(-2):1}/${split[*]:(-1)}"
-      else
-        pwd="/${split[1]}/.../${split[*]:(-2):1}/${split[*]:(-1)}"
+    if (pwd | grep -q "^$GOPATH/src/[^/]*/[^/]*/"); then
+      local pwd; pwd=$(pwd | sed -e "s|^$GOPATH/src/[^/]*/[^/]*/|$GOLANG_SYMBOL|")
+    else
+      # Use ~ to represent $HOME prefix
+      local pwd; pwd=$(pwd | sed -e "s|^$HOME|~|")
+      # shellcheck disable=SC1001,SC2088
+      if [[ ( $pwd = ~\/*\/* || $pwd = \/*\/*/* ) && ${#pwd} -gt $MAX_PATH_LENGTH ]]; then
+        local IFS='/'
+        read -ra split <<< "$pwd"
+        if [[ $pwd = ~* ]]; then
+          pwd="~/${split[1]}/.../${split[*]:(-2):1}/${split[*]:(-1)}"
+        else
+          pwd="/${split[1]}/.../${split[*]:(-2):1}/${split[*]:(-1)}"
+        fi
       fi
     fi
     __prompt_block $BLACK_BRIGHT $WHITE_BRIGHT "$pwd"
