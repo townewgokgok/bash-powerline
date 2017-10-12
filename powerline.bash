@@ -183,6 +183,7 @@ __powerline() {
       ref="$ref_symbol $branch"
     fi
 
+    local dirty
     local marks
 
     # check if HEAD is dirty
