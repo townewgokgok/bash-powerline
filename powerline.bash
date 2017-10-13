@@ -23,10 +23,18 @@ __powerline() {
   # Unicode symbols
   if [ -z "${POWERLINE_FONT+x}" ]; then
     readonly GIT_BRANCH_SYMBOL='⑂'
+    readonly GIT_SYMBOL='Git>'
     readonly GOLANG_SYMBOL='Go>'
+    readonly RUBY_SYMBOL='Rb>'
+    readonly JS_SYMBOL='JS>'
+    readonly PHP_SYMBOL='PHP>'
   else
-    readonly GIT_BRANCH_SYMBOL='' # ''
+    readonly GIT_BRANCH_SYMBOL=''
+    readonly GIT_SYMBOL=''
     readonly GOLANG_SYMBOL=''
+    readonly RUBY_SYMBOL=''
+    readonly JS_SYMBOL=''
+    readonly PHP_SYMBOL=''
   fi
   readonly GIT_BRANCH_ADDED_SYMBOL='Δ'
   readonly GIT_BRANCH_UNADDED_SYMBOL='*'
@@ -248,11 +256,24 @@ __powerline() {
   }
 
   __pwd_block() {
+    local pwd
     if (pwd | grep -q "^$GOPATH/src/[^/]*/[^/]*/"); then
-      local pwd; pwd=$(pwd | sed -e "s|^$GOPATH/src/[^/]*/[^/]*/|$GOLANG_SYMBOL |")
+      pwd=$(pwd | sed -e "s|^$GOPATH/src/[^/]*/[^/]*/|$GOLANG_SYMBOL |")
+    elif (git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
+      local top=$(git rev-parse --show-toplevel)
+      pwd=$(pwd | sed "s|^$(dirname "$top")/||")
+      if [ -e "$top/Gemfile" ]; then
+        pwd="$RUBY_SYMBOL $pwd"
+      elif [ -e "$top/package.json" ]; then
+        pwd="$JS_SYMBOL $pwd"
+      elif [ -e "$top/composer.json" ]; then
+        pwd="$PHP_SYMBOL $pwd"
+      else
+        pwd="$GIT_SYMBOL $pwd"
+      fi
     else
       # Use ~ to represent $HOME prefix
-      local pwd; pwd=$(pwd | sed -e "s|^$HOME|~|")
+      pwd=$(pwd | sed -e "s|^$HOME|~|")
       # shellcheck disable=SC1001,SC2088
       if [[ ( $pwd = ~\/*\/* || $pwd = \/*\/*/* ) && ${#pwd} -gt $MAX_PATH_LENGTH ]]; then
         local IFS='/'
